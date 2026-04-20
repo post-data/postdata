@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -38,9 +39,16 @@
       <div class="preview-panel">
         <div class="post-preview" id="postPreview">
           <div class="post-preview__inner">
-            <textarea class="post-textarea-inline" id="postText" placeholder="Escribe aquí..." maxlength="500"></textarea>
+            <textarea class="post-textarea-inline" id="postText" placeholder="Escribe tu cierre aquí..." maxlength="500"></textarea>
           </div>
-          <div class="post-preview__hashtag" id="previewHashtag">#CATEGORÍA</div>
+          <div class="post-preview__footer-preview">
+            <button class="preview-like-btn" onclick="handlePreviewLike(event)">
+              <span class="material-symbols-outlined" id="previewLikeIcon">favorite</span>
+              <span id="previewLikeCount">0</span>
+            </button>
+            <div id="previewHashtag">#CATEGORÍA</div>
+            <span class="material-symbols-outlined">ios_share</span>
+          </div>
         </div>
       </div>
 
@@ -49,7 +57,6 @@
           <h3 class="control-label">Categoría</h3>
           <div class="tags-grid" id="tagsGrid"></div>
         </div>
-
         <div class="control-group">
           <h3 class="control-label">Tipografía</h3>
           <select class="font-select" id="fontSelect">
@@ -58,37 +65,26 @@
             <option value="'Georgia', serif">Georgia Serif</option>
           </select>
         </div>
-
         <div class="control-group">
           <h3 class="control-label">Color</h3>
           <div class="color-grid" id="colorGrid"></div>
         </div>
-
         <button class="publish-btn" onclick="publishPost()">Publicar</button>
       </div>
     </div>
-  </main>
-
-  <main id="page-terminos" class="page">
-    <h2 class="page-title">Términos y Condiciones</h2>
-    <p>Registro anónimo de fin de ciclos.</p>
-  </main>
-
-  <main id="page-nosotros" class="page">
-    <h2 class="page-title">Nosotros</h2>
-    <p>Archivo colaborativo de etapas concluidas.</p>
   </main>
 
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
     <div class="modal" id="modal" onclick="event.stopPropagation()">
       <div class="modal__post" id="modalPost"></div>
       <div class="modal__footer">
-        <button class="modal__action" onclick="handleLike(event)">
-          <span class="icon">heart</span> <span id="modalLikeCount">0</span>
+        <button class="modal__action" id="modalLikeBtn" onclick="handleLike(event)">
+          <span class="material-symbols-outlined">favorite</span>
+          <span id="modalLikeCount">0</span>
         </button>
         <div id="modalHashtag" class="modal__hashtag"></div>
-        <button class="modal__action" onclick="share()">
-          <span class="icon">ExternalLink</span>
+        <button class="modal__action">
+          <span class="material-symbols-outlined">ios_share</span>
         </button>
       </div>
     </div>

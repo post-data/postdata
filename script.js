@@ -11,18 +11,16 @@ const COLORS = [
 
 const TAGS = ['Amor', 'Amistad', 'Mascotas', 'Laboral', 'Estudios', 'Otros'];
 
-// ESTADO REACTIVO
 let state = {
   posts: [
     { id: 1, text: "Tres años esperando que cambiara. No cambió. Yo sí.", tag: "Amor", font: "'JetBrains Mono', monospace", color: COLORS[0], likes: 12 },
     { id: 2, text: "El trabajo que me quitó el sueño ya no merece mis noches.", tag: "Laboral", font: "'JetBrains Mono', monospace", color: COLORS[4], likes: 8 }
   ],
-  newPost: { text: "", tag: "Otros", font: "'JetBrains Mono', monospace", color: COLORS[2] },
+  newPost: { text: "", tag: "Otros", font: "'JetBrains Mono', monospace", color: COLORS[2], likes: 0 },
   currentPage: 'inicio',
   currentModalId: null
 };
 
-// INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
   renderTags();
   renderColors();
@@ -35,26 +33,38 @@ function setupEventListeners() {
     state.newPost.text = e.target.value;
     updatePreview();
   });
-
   document.getElementById('fontSelect').addEventListener('change', (e) => {
     state.newPost.font = e.target.value;
     updatePreview();
   });
 }
 
-// RENDERING FUNCTIONS
 function renderPosts() {
   const grid = document.getElementById('postsGrid');
   grid.innerHTML = state.posts.map((post) => `
     <div class="post-card" style="background:${post.color.bg}; color:${post.color.text}" onclick="openModal(${post.id})">
       <div class="post-card__text" style="font-family:${post.font}">${post.text}</div>
       <div class="post-card__footer">
-        <div style="text-align:left">heart ${post.likes}</div>
+        <div class="grid-like-container" onclick="handleGridLike(event, ${post.id})">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' ${post.likes > 0 ? 1 : 0}">favorite</span> 
+          <span>${post.likes}</span>
+        </div>
         <div class="post-card__hashtag">#${post.tag.toUpperCase()}</div>
-        <div style="text-align:right">ExternalLink</div>
+        <div style="text-align:right">
+          <span class="material-symbols-outlined">ios_share</span>
+        </div>
       </div>
     </div>
   `).join('');
+}
+
+function handleGridLike(e, id) {
+  e.stopPropagation();
+  const post = state.posts.find(p => p.id === id);
+  if (post) {
+    post.likes++;
+    renderPosts();
+  }
 }
 
 function renderTags() {
@@ -73,7 +83,6 @@ function renderColors() {
   `).join('');
 }
 
-// ACTION HANDLERS
 function setTag(tag) {
   state.newPost.tag = tag;
   renderTags();
@@ -90,23 +99,27 @@ function updatePreview() {
   const preview = document.getElementById('postPreview');
   const hashtag = document.getElementById('previewHashtag');
   const textarea = document.getElementById('postText');
-  
   preview.style.backgroundColor = state.newPost.color.bg;
   preview.style.color = state.newPost.color.text;
   textarea.style.fontFamily = state.newPost.font;
   hashtag.textContent = `#${state.newPost.tag.toUpperCase()}`;
 }
 
+function handlePreviewLike(e) {
+  e.stopPropagation();
+  state.newPost.likes++;
+  document.getElementById('previewLikeCount').textContent = state.newPost.likes;
+  document.getElementById('previewLikeIcon').style.fontVariationSettings = "'FILL' 1";
+}
+
 function publishPost() {
   if (!state.newPost.text) return;
-  const post = {
-    ...state.newPost,
-    id: Date.now(),
-    likes: 0
-  };
+  const post = { ...state.newPost, id: Date.now() };
   state.posts.unshift(post);
-  state.newPost.text = "";
+  state.newPost = { text: "", tag: "Otros", font: "'JetBrains Mono', monospace", color: COLORS[2], likes: 0 };
   document.getElementById('postText').value = "";
+  document.getElementById('previewLikeCount').textContent = "0";
+  document.getElementById('previewLikeIcon').style.fontVariationSettings = "'FILL' 0";
   showPage('inicio');
   renderPosts();
 }
@@ -117,25 +130,22 @@ function handleLike(e) {
   if (post) {
     post.likes++;
     document.getElementById('modalLikeCount').textContent = post.likes;
-    renderPosts(); // Update background grid
+    document.querySelector('#modalLikeBtn .material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+    renderPosts();
   }
 }
 
-// NAVIGATION & MODAL
 function navigationHandler(e) {
   e.preventDefault();
-  const page = e.target.getAttribute('data-page');
-  showPage(page, e.target);
+  showPage(e.target.getAttribute('data-page'), e.target);
 }
 
 function showPage(id, navElement = null) {
   state.currentPage = id;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('page--active'));
   document.getElementById('page-' + id).classList.add('page--active');
-  
   document.querySelectorAll('.nav__link').forEach(l => l.classList.remove('nav__link--active'));
   if (navElement) navElement.classList.add('nav__link--active');
-  
   window.scrollTo(0, 0);
 }
 
@@ -143,15 +153,13 @@ function openModal(id) {
   state.currentModalId = id;
   const post = state.posts.find(p => p.id === id);
   const overlay = document.getElementById('modalOverlay');
-  const modal = document.getElementById('modal');
-  
   overlay.style.backgroundColor = post.color.bg;
-  modal.style.color = post.color.text;
+  document.getElementById('modal').style.color = post.color.text;
   document.getElementById('modalPost').textContent = post.text;
   document.getElementById('modalPost').style.fontFamily = post.font;
   document.getElementById('modalHashtag').textContent = `#${post.tag.toUpperCase()}`;
   document.getElementById('modalLikeCount').textContent = post.likes;
-  
+  document.querySelector('#modalLikeBtn .material-symbols-outlined').style.fontVariationSettings = post.likes > 0 ? "'FILL' 1" : "'FILL' 0";
   overlay.classList.add('open');
 }
 
