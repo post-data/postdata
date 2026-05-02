@@ -247,9 +247,8 @@ function handleTextInput(v) {
 }
 
 function setTag(t) {
-  state.newPost.tag = t;
-  document.getElementById('previewHashtag').textContent = `#${t.toUpperCase()}`;
-  renderTags();
+    state.newPost.tag = t; 
+    renderTags();           
 }
 
 function setColor(index) {
@@ -267,9 +266,15 @@ function updatePreview() {
 }
 
 function renderTags() {
-  document.getElementById('tagsGrid').innerHTML = TAGS.map(t => 
-    `<button class="tag ${state.newPost.tag === t ? 'selected' : ''}" onclick="setTag('${t}')">#${t}</button>`
-  ).join('');
+  const grid = document.getElementById('tagsGrid');
+  if (!grid) return; // Evita errores si el elemento no existe
+
+  grid.innerHTML = TAGS.map(t => `
+    <button class="tag ${state.newPost.tag === t ? 'selected' : ''}" 
+            onclick="setTag('${t}')">
+      #${t}
+    </button>
+  `).join("");
 }
 
 function renderColors() {
